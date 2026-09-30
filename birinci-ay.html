@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bölüm 1: İlk Ay</title>
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="description" content="Birinci Ayımız">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Bölüm 1: İlk Ay">
+  <meta property="og:description" content="Birinci Ayımız">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌕</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #1a1a2e;
+      color: #e94560;
+      font-family: 'Press Start 2P', monospace;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .star {
+      position: fixed;
+      background: #f1f1f1;
+      pointer-events: none;
+      animation: twinkle 3s steps(3) infinite;
+    }
+    #moon {
+      position: absolute;
+      top: 28px;
+      left: 28px;
+      width: 60px;
+      height: 60px;
+      transition: filter 1.2s;
+    }
+    #moon.full { filter: drop-shadow(0 0 14px rgba(244, 233, 193, 0.55)); }
+    #moon.look { animation: glance 0.5s steps(2) 4; }
+    .pixel-box {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      border: 4px solid #fff;
+      padding: 24px 20px;
+      background: #16213e;
+      border-radius: 4px;
+      box-shadow: 6px 6px 0 #0f3460;
+    }
+    .pets {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 30px;
+      margin-bottom: 24px;
+      transition: gap 1.2s steps(6);
+    }
+    .pets.close { gap: 8px; }
+    .pixel {
+      position: relative;
+      cursor: pointer;
+    }
+    .px-dot {
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: block;
+    }
+    #heart { animation: beat 1.2s ease-in-out infinite; }
+    #panda { animation: bob 2.2s ease-in-out infinite; }
+    #koala { animation: bob 2.2s ease-in-out 1.1s infinite; }
+    #panda.talk, #koala.talk { animation: talk 0.36s steps(2) infinite; }
+    #panda.hop, #koala.hop, #heart.hop { animation: hop 0.45s steps(3); }
+    .pets.cheer #panda { animation: hop 0.5s steps(3) 5; }
+    .pets.cheer #koala { animation: hop 0.5s steps(3) 0.25s 5; }
+
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes talk {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    @keyframes hop {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.8; }
+    }
+    @keyframes glance { 50% { transform: scale(1.15); } }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes shake {
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    @keyframes stamp {
+      from { opacity: 0; transform: scale(3); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes floatUp {
+      to { opacity: 0; transform: translateY(-56px); }
+    }
+
+    .scene { display: none; }
+    .scene.active { display: block; animation: rise 0.5s steps(5); }
+    h2 {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #f1f1f1;
+      margin: 0 0 18px;
+    }
+
+    .logo {
+      font-size: 22px;
+      line-height: 1.4;
+      color: #f1f1f1;
+      text-shadow: 3px 3px 0 #e94560;
+    }
+    .logo span {
+      display: block;
+      margin: 6px 0;
+      font-size: 12px;
+      color: #e94560;
+      text-shadow: none;
+    }
+    .chapter {
+      font-size: 9px;
+      color: #4ecca3;
+      margin: 16px 0 26px;
+    }
+    .menu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .menu-item {
+      position: relative;
+      background: none;
+      border: none;
+      color: #f1f1f1;
+      font-family: inherit;
+      font-size: 11px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .menu-item.dim { color: #5a6472; }
+    .menu-item.sel::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      margin-top: -5px;
+      border-left: 8px solid #e94560;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      animation: blink 1s steps(1) infinite;
+    }
+    .shake { animation: shake 0.3s steps(3); }
+    #menu-msg {
+      min-height: 22px;
+      margin-top: 16px;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      color: #b8c1cc;
+    }
+
+    .dialog {
+      position: relative;
+      margin-top: 12px;
+      border: 3px solid #fff;
+      background: #0f1a33;
+      padding: 20px 14px 22px;
+      min-height: 120px;
+      text-align: left;
+      cursor: pointer;
+      user-select: none;
+    }
+    .dialog:focus { outline: none; }
+    .dialog:focus-visible { box-shadow: 0 0 0 3px #4ecca3; }
+    .speaker {
+      position: absolute;
+      top: -13px;
+      left: 10px;
+      padding: 5px 8px;
+      border: 2px solid #fff;
+      background: #e94560;
+      color: #fff;
+      font-size: 8px;
+    }
+    .speaker.koala {
+      left: auto;
+      right: 10px;
+      background: #577590;
+    }
+    .speaker.hidden { display: none; }
+    .dialog-text {
+      font-family: 'VT323', monospace;
+      font-size: 23px;
+      line-height: 1.15;
+      color: #f1f1f1;
+    }
+    .dialog-text.narr { color: #8d99ae; }
+    .next {
+      position: absolute;
+      right: 12px;
+      bottom: 9px;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid #4ecca3;
+      visibility: hidden;
+      animation: blink 0.8s steps(1) infinite;
+    }
+    .next.show { visibility: visible; }
+    .hint {
+      margin-top: 14px;
+      font-size: 7px;
+      color: #5a6472;
+    }
+
+    .stats {
+      min-height: 162px;
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      color: #f1f1f1;
+      text-align: left;
+    }
+    .stat {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 4px 0;
+      animation: rise 0.3s steps(3);
+    }
+    .stat .dots {
+      flex: 1;
+      border-bottom: 3px dotted #3d5a80;
+    }
+    .stat .val { color: #4ecca3; }
+    .stat .val.over { color: #e94560; animation: blink 0.4s steps(1) 6; }
+    .rank {
+      margin-top: 18px;
+      font-size: 10px;
+      color: #b8c1cc;
+      visibility: hidden;
+    }
+    .rank b {
+      display: inline-block;
+      margin-left: 10px;
+      font-size: 28px;
+      color: #f9c74f;
+      text-shadow: 3px 3px 0 #e94560;
+      vertical-align: middle;
+    }
+    .rank.show { visibility: visible; }
+    .rank.show b { animation: stamp 0.4s steps(4); }
+
+    .bar-track {
+      border: 3px solid #fff;
+      background: #0f3460;
+      height: 32px;
+      padding: 3px;
+    }
+    .bar-fill {
+      width: 0%;
+      height: 100%;
+      background: #4ecca3;
+      box-shadow: inset -4px 0 0 rgba(0, 0, 0, 0.3);
+    }
+    #percent {
+      color: #4ecca3;
+      font-size: 10px;
+      margin-top: 10px;
+    }
+    #tip {
+      min-height: 50px;
+      margin-top: 18px;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      color: #b8c1cc;
+    }
+
+    .done { color: #f9c74f; margin-bottom: 8px; }
+    .saved {
+      margin-bottom: 20px;
+      font-size: 8px;
+      color: #4ecca3;
+    }
+    .letter {
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      line-height: 1.2;
+      color: #f1f1f1;
+      text-align: left;
+    }
+    .letter p { margin: 0 0 12px; }
+    .letter ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 12px;
+    }
+    .letter li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 8px;
+    }
+    .letter li::before {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 7px;
+      width: 6px;
+      height: 6px;
+      background: #e94560;
+    }
+    .letter .last {
+      margin: 20px 0 0;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      line-height: 1.8;
+      color: #e94560;
+      text-align: center;
+    }
+    .fade { opacity: 0; animation: rise 0.7s steps(4) forwards; }
+
+    .btn {
+      background: #e94560;
+      color: #fff;
+      border: 3px solid #fff;
+      font-family: inherit;
+      font-size: 10px;
+      padding: 12px 16px;
+      margin-top: 20px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #fff;
+    }
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 #fff;
+    }
+    .btn.hidden { visibility: hidden; }
+
+    .confetti {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 8px;
+      height: 8px;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .mini-heart {
+      position: fixed;
+      width: 27px;
+      height: 24px;
+      pointer-events: none;
+      z-index: 998;
+      animation: floatUp 1s steps(8) forwards;
+    }
+
+    .home {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 10;
+      padding: 8px 10px;
+      border: 3px solid #fff;
+      background: #16213e;
+      color: #f1f1f1;
+      font-size: 8px;
+      text-decoration: none;
+      box-shadow: 3px 3px 0 #0f3460;
+    }
+    .home:hover, .home:focus-visible { outline: none; border-color: #4ecca3; color: #4ecca3; }
+    .home:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #0f3460; }
+    @media (max-width: 480px) {
+      body { padding-top: 64px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="home" href="index.html">◄ MENÜ</a>
+  <div id="moon" aria-hidden="true"><i class="px-dot"></i></div>
+
+  <main class="pixel-box">
+    <div class="pets" id="pets">
+      <div class="pixel" id="panda" title="panda"></div>
+      <div class="pixel" id="heart"></div>
+      <div class="pixel" id="koala" title="koala"></div>
+    </div>
+
+    <section class="scene active" id="scene-title">
+      <div class="logo">PANDA<span>&amp;</span>KOALA</div>
+      <div class="chapter">BÖLÜM 1: İLK AY</div>
+      <div class="menu">
+        <button class="menu-item dim" id="p1" type="button">1 OYUNCU</button>
+        <button class="menu-item sel" id="p2" type="button">2 OYUNCU</button>
+      </div>
+      <div id="menu-msg" aria-live="polite"></div>
+    </section>
+
+    <section class="scene" id="scene-dialog">
+      <div class="dialog" id="dialog" tabindex="0">
+        <div class="speaker hidden" id="speaker"></div>
+        <div class="dialog-text" id="dtext" aria-live="polite"></div>
+        <div class="next" id="next"></div>
+      </div>
+      <div class="hint">DEVAM ETMEK İÇİN DOKUN</div>
+    </section>
+
+    <section class="scene" id="scene-stats">
+      <h2>BÖLÜM 1 · SONUÇLAR</h2>
+      <div class="stats" id="stats"></div>
+      <div class="rank" id="rank">DERECE <b>S</b></div>
+      <button class="btn hidden" id="to-load" type="button">BÖLÜM 2'YE GEÇ</button>
+    </section>
+
+    <section class="scene" id="scene-loading">
+      <h2>BÖLÜM 2 YÜKLENİYOR</h2>
+      <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+      <div id="percent">%0</div>
+      <div id="tip"></div>
+    </section>
+
+    <section class="scene" id="scene-final">
+      <h2 class="done fade">BÖLÜM 1 TAMAMLANDI</h2>
+      <div class="saved fade">✓ KAYDEDİLDİ</div>
+      <div class="letter">
+        <p class="fade">Bir ay önce başladık.</p>
+        <p class="fade">Kısa bir süre, biliyorum. Ama bazı şeyleri fark etmeme yetti:</p>
+        <ul>
+          <li class="fade">Artık hayatımda sürekli görmek istediğim birisi var.</li>
+          <li class="fade">Seninleyken kendimi huzurlu hissediyorum.</li>
+          <li class="fade">Günüm nasıl geçerse geçsin, sonu seninle konuşmaksa iyi bitiyor.</li>
+        </ul>
+        <p class="fade">Büyük laflar etmeyeceğim. Sadece ilk bölüm çok güzeldi ve devamını gerçekten merak ediyorum.</p>
+        <p class="last fade">BİRİNCİ AYIMIZ KUTLU OLSUN</p>
+      </div>
+      <div class="fade">
+        <button class="btn" id="replay" type="button">↺ BAŞTAN OYNA</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const PX = 7;
+    const DAYS = 30;
+
+    const HEART = [
+      '.XX...XX.',
+      'XXXX.XXXX',
+      'XXXXXXXXX',
+      'XXXXXXXXX',
+      '.XXXXXXX.',
+      '..XXXXX..',
+      '...XXX...',
+      '....X....'
+    ];
+
+    // Her karakter paletteki bir renge, nokta ise bos piksele karsilik gelir.
+    function pixelShadow(rows, palette, px) {
+      const out = [];
+      rows.forEach((row, y) => {
+        [...row].forEach((ch, x) => {
+          const color = palette[ch];
+          if (color) out.push(x * px + 'px ' + y * px + 'px ' + color);
+        });
+      });
+      return out.join(',');
+    }
+
+    function makeDot(size, shadow) {
+      const dot = document.createElement('i');
+      dot.className = 'px-dot';
+      dot.style.width = dot.style.height = size + 'px';
+      dot.style.boxShadow = shadow;
+      return dot;
+    }
+
+    function drawPixelArt(id, rows, palette) {
+      const host = document.getElementById(id);
+      host.style.width = rows[0].length * PX + 'px';
+      host.style.height = rows.length * PX + 'px';
+      host.appendChild(makeDot(PX, pixelShadow(rows, palette, PX)));
+    }
+
+    drawPixelArt('heart', HEART, { X: '#e94560' });
+
+    drawPixelArt('panda', [
+      'KK.....KK',
+      'KKWWWWWKK',
+      '.WWWWWWW.',
+      '.KKWWWKK.',
+      '.KKWWWKK.',
+      '.WWWKWWW.',
+      '.WWWWWWW.',
+      '..WWWWW..'
+    ], { K: '#3d3d5c', W: '#f1f1f1' });
+
+    drawPixelArt('koala', [
+      'GG.....GG',
+      'GLG...GLG',
+      'GGGGGGGGG',
+      '.GGGGGGG.',
+      '.GDGGGDG.',
+      '.GGNNNGG.',
+      '..GGNGG..',
+      '...GGG...'
+    ], { G: '#b8c1cc', L: '#e5c1cf', D: '#3d3d5c', N: '#5a6472' });
+
+    for (let i = 0; i < 48; i++) {
+      const s = document.createElement('div');
+      const size = Math.random() < 0.75 ? 2 : 3;
+      s.className = 'star';
+      s.style.width = s.style.height = size + 'px';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.animationDuration = 2 + Math.random() * 4 + 's';
+      s.style.animationDelay = -Math.random() * 6 + 's';
+      document.body.appendChild(s);
+    }
+
+    const moonEl = document.getElementById('moon');
+    const moonDot = moonEl.firstElementChild;
+    const MOON_R = 7;
+    const MPX = 4;
+    const CRATERS = ['9,4', '10,4', '4,6', '5,6', '9,9', '10,10', '6,11'];
+    let moonPhase = 0.12;
+    let moonAnim = 0;
+    moonDot.style.width = moonDot.style.height = MPX + 'px';
+
+    // phase: 0 = yeni ay, 1 = dolunay. Golge dairesi sola kaydikca ay dolar.
+    function renderMoon(phase) {
+      const r2 = (MOON_R + 0.5) * (MOON_R + 0.5);
+      const off = phase * (2 * MOON_R + 2);
+      const out = [];
+      for (let y = 0; y <= 2 * MOON_R; y++) {
+        for (let x = 0; x <= 2 * MOON_R; x++) {
+          const dx = x - MOON_R;
+          const dy = y - MOON_R;
+          if (dx * dx + dy * dy > r2) continue;
+          const lit = (dx + off) * (dx + off) + dy * dy > r2;
+          const color = !lit ? '#262650' : CRATERS.includes(x + ',' + y) ? '#d9cc9c' : '#f4e9c1';
+          out.push(x * MPX + 'px ' + y * MPX + 'px ' + color);
+        }
+      }
+      moonDot.style.boxShadow = out.join(',');
+    }
+
+    function setMoon(target, ms = 700) {
+      cancelAnimationFrame(moonAnim);
+      const from = moonPhase;
+      const t0 = performance.now();
+      (function frame(now) {
+        const k = Math.min(1, (now - t0) / ms);
+        moonPhase = from + (target - from) * k;
+        renderMoon(moonPhase);
+        if (k < 1) moonAnim = requestAnimationFrame(frame);
+      })(t0);
+    }
+
+    function moonNow(phase) {
+      cancelAnimationFrame(moonAnim);
+      moonPhase = phase;
+      renderMoon(phase);
+    }
+
+    renderMoon(moonPhase);
+
+    let actx = null;
+
+    function initAudio() {
+      if (!actx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) actx = new AC();
+      }
+      if (actx && actx.state === 'suspended') actx.resume();
+    }
+
+    function beep(freq, dur = 0.05, vol = 0.035, type = 'square', when = 0) {
+      if (!actx) return;
+      const t = actx.currentTime + when;
+      const o = actx.createOscillator();
+      const g = actx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g);
+      g.connect(actx.destination);
+      o.start(t);
+      o.stop(t + dur + 0.02);
+    }
+
+    function jingle(notes, step = 0.1) {
+      notes.forEach((f, i) => beep(f, step * 1.6, 0.04, 'square', i * step));
+    }
+
+    const TITLE = document.title;
+    document.addEventListener('visibilitychange', () => {
+      document.title = document.hidden ? 'Panda ve koala bekliyor...' : TITLE;
+    });
+
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    const box = document.querySelector('.pixel-box');
+    const pets = document.getElementById('pets');
+    const panda = document.getElementById('panda');
+    const koala = document.getElementById('koala');
+    let scene = 'title';
+
+    function goTo(name) {
+      scene = name;
+      document.querySelectorAll('.scene').forEach(s => {
+        s.classList.toggle('active', s.id === 'scene-' + name);
+      });
+      window.scrollTo(0, 0);
+    }
+
+    const MINI_HEART = pixelShadow(HEART, { X: '#e94560' }, 3);
+
+    function floatHeart(el) {
+      const r = el.getBoundingClientRect();
+      const h = document.createElement('div');
+      h.className = 'mini-heart';
+      h.style.left = r.left + r.width / 2 - 13 + (Math.random() - 0.5) * 24 + 'px';
+      h.style.top = r.top - 20 + 'px';
+      h.appendChild(makeDot(3, MINI_HEART));
+      document.body.appendChild(h);
+      h.addEventListener('animationend', () => h.remove());
+    }
+
+    ['panda', 'heart', 'koala'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('click', () => {
+        initAudio();
+        el.classList.remove('hop');
+        void el.offsetWidth;
+        el.classList.add('hop');
+        beep({ panda: 392, heart: 587, koala: 784 }[id], 0.08, 0.03);
+        floatHeart(el);
+      });
+      el.addEventListener('animationend', e => {
+        if (e.animationName === 'hop') el.classList.remove('hop');
+      });
+    });
+
+    // --- Baslik ekrani ---
+    const menuMsg = document.getElementById('menu-msg');
+    const p1 = document.getElementById('p1');
+    const SOLO = [
+      'Bu oyun tek başına oynanmıyor.',
+      'Hâlâ tek başına oynanmıyor.',
+      'Israrını takdir ediyorum. Cevap yine hayır.'
+    ];
+    let soloTries = 0;
+
+    p1.addEventListener('click', () => {
+      initAudio();
+      beep(110, 0.18, 0.05);
+      p1.classList.remove('shake');
+      void p1.offsetWidth;
+      p1.classList.add('shake');
+      menuMsg.textContent = SOLO[Math.min(soloTries++, SOLO.length - 1)];
+    });
+
+    document.getElementById('p2').addEventListener('click', () => {
+      initAudio();
+      jingle([523, 659, 784]);
+      goTo('dialog');
+      lineIdx = 0;
+      showLine(0);
+      dialogBox.focus();
+    });
+
+    // --- Diyalog ---
+    const SCRIPT = [
+      { who: 'koala', text: 'Bu sayfayı hatırlıyor musun?' },
+      { who: 'panda', text: 'Enerji barı olan mı? O gün epey işe yaramıştı.' },
+      { who: 'koala', text: 'Bugün enerji dağıtmıyoruz. Başka bir sebeple buradayız.' },
+      { who: 'panda', text: 'Neymiş?' },
+      { who: 'koala', text: 'Bir ay oldu.' },
+      { who: null, text: 'Panda gökyüzüne bakıyor.', moon: true },
+      { who: 'panda', text: 'Bir ay mı?' },
+      { who: 'koala', text: 'Evet! 30 Ağustos ilk buluşma günümüzdü.' },
+      { who: 'panda', text: 'Aklında mı tuttun?' },
+      { who: 'koala', text: '...Tesadüfen gözüme çarptı.' },
+      { who: 'panda', text: 'Tabii canım.' },
+      { who: 'koala', text: 'Neyse. Sonuç ekranı hazır, bir bakalım mı?' }
+    ];
+    const VOICE = { panda: 196, koala: 392 };
+    const dialogBox = document.getElementById('dialog');
+    const speakerEl = document.getElementById('speaker');
+    const dtext = document.getElementById('dtext');
+    const nextEl = document.getElementById('next');
+    let lineIdx = 0;
+    let typing = false;
+    let typeTimer = 0;
+    let fullText = '';
+
+    function showLine(i) {
+      const line = SCRIPT[i];
+      const who = line.who;
+      fullText = (who ? '' : '* ') + line.text.replace('{gun}', DAYS);
+      speakerEl.className = 'speaker ' + (who || 'hidden');
+      speakerEl.textContent = who ? who.toUpperCase() : '';
+      dtext.classList.toggle('narr', !who);
+      panda.classList.toggle('talk', who === 'panda');
+      koala.classList.toggle('talk', who === 'koala');
+      nextEl.classList.remove('show');
+      if (line.moon) {
+        moonEl.classList.remove('look');
+        void moonEl.offsetWidth;
+        moonEl.classList.add('look');
+      }
+      setMoon(0.12 + 0.6 * (i + 1) / SCRIPT.length);
+
+      let n = 0;
+      typing = true;
+      dtext.textContent = '';
+      clearInterval(typeTimer);
+      typeTimer = setInterval(() => {
+        n++;
+        dtext.textContent = fullText.slice(0, n);
+        if (n % 2 && fullText[n - 1] !== ' ') {
+          beep((VOICE[who] || 294) * (0.94 + Math.random() * 0.12), 0.04, 0.022);
+        }
+        if (n >= fullText.length) endTyping();
+      }, 32);
+    }
+
+    function endTyping() {
+      clearInterval(typeTimer);
+      typing = false;
+      dtext.textContent = fullText;
+      nextEl.classList.add('show');
+      panda.classList.remove('talk');
+      koala.classList.remove('talk');
+    }
+
+    function advance() {
+      if (typing) {
+        endTyping();
+        return;
+      }
+      beep(660, 0.03, 0.02);
+      lineIdx++;
+      if (lineIdx < SCRIPT.length) showLine(lineIdx);
+      else startStats();
+    }
+
+    dialogBox.addEventListener('click', advance);
+    document.addEventListener('keydown', e => {
+      if (scene !== 'dialog') return;
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        advance();
+      }
+    });
+
+    // --- Sonuc ekrani ---
+    const statsEl = document.getElementById('stats');
+    const rankEl = document.getElementById('rank');
+    const toLoadBtn = document.getElementById('to-load');
+
+    function countUp(el, target, ms) {
+      return new Promise(resolve => {
+        const t0 = performance.now();
+        let lastTick = 0;
+        (function frame(now) {
+          const k = Math.min(1, Math.max(0, (now - t0) / ms));
+          el.textContent = Math.round(target * k).toLocaleString('tr-TR');
+          if (now - lastTick > 60) {
+            beep(880 + k * 440, 0.02, 0.015);
+            lastTick = now;
+          }
+          if (k < 1) requestAnimationFrame(frame);
+          else resolve();
+        })(t0);
+      });
+    }
+
+    async function startStats() {
+      goTo('stats');
+      setMoon(0.78);
+      const rows = [
+        ['Birlikte geçen gün', DAYS],
+        ['Saat', DAYS * 24],
+        ['Dakika', DAYS * 24 * 60],
+        ['Seninle sıkıldığım an', 0],
+        ['Aklıma geldiğin an', 9999, true]
+      ];
+      statsEl.innerHTML = '';
+      rankEl.classList.remove('show');
+      toLoadBtn.classList.add('hidden');
+      await sleep(400);
+
+      for (const [label, value, overflow] of rows) {
+        const row = document.createElement('div');
+        const name = document.createElement('span');
+        const dots = document.createElement('span');
+        const val = document.createElement('span');
+        row.className = 'stat';
+        name.textContent = label;
+        dots.className = 'dots';
+        val.className = 'val';
+        row.append(name, dots, val);
+        statsEl.appendChild(row);
+        await countUp(val, value, overflow ? 1300 : 650);
+        if (overflow) {
+          val.textContent = 'TAŞTI!';
+          val.classList.add('over');
+          beep(98, 0.4, 0.05, 'sawtooth');
+        }
+        await sleep(260);
+      }
+
+      await sleep(300);
+      rankEl.classList.add('show');
+      jingle([523, 659, 784, 1047], 0.09);
+      await sleep(800);
+      toLoadBtn.classList.remove('hidden');
+    }
+
+    toLoadBtn.addEventListener('click', startLoading);
+
+    // --- Bolum 2 yukleniyor ---
+    const fill = document.getElementById('bar-fill');
+    const percent = document.getElementById('percent');
+    const tip = document.getElementById('tip');
+    const TIPS = [
+      'İPUCU: Koalalar güne geç başlar. Çoğu zaman günaydın mesajını ilk onlar yazamayabilir.',
+    ];
+    const LOAD_MS = 6000;
+
+    function startLoading() {
+      toLoadBtn.classList.add('hidden');
+      goTo('loading');
+      fill.style.width = '0%';
+      percent.textContent = '%0';
+      tip.textContent = TIPS[0];
+      const t0 = performance.now();
+      let stallUntil = 0;
+
+      function step(now) {
+        // Mobilde ilk rAF zamani performance.now()'dan once olabilir; negatif t NaN uretir.
+        const t = Math.max(0, now - t0);
+        let value;
+        let nextTip;
+        if (t < LOAD_MS) {
+          // Gercek yukleme cubuklari gibi: yavas baslar, hizlanir, %99'da biraz takilir.
+          value = 99 * Math.pow(t / LOAD_MS, 2.2);
+          nextTip = TIPS[Math.min(TIPS.length - 1, Math.floor(t / (LOAD_MS / TIPS.length)))];
+        } else {
+          if (!stallUntil) stallUntil = now + 1300;
+          value = now >= stallUntil ? 100 : 99;
+          nextTip = 'Son rötuşlar yapılıyor...';
+        }
+        if (tip.textContent !== nextTip) tip.textContent = nextTip;
+
+        fill.style.width = value + '%';
+        percent.textContent = '%' + Math.floor(value);
+        moonNow(0.78 + 0.22 * value / 100);
+
+        if (value < 100) requestAnimationFrame(step);
+        else finishLoading();
+      }
+      requestAnimationFrame(step);
+    }
+
+    function finishLoading() {
+      moonEl.classList.add('full');
+      jingle([523, 659, 784, 1047, 784, 1047], 0.11);
+      celebrate();
+      setTimeout(showFinal, 900);
+    }
+
+    // --- Final ---
+    document.querySelectorAll('#scene-final .fade').forEach((el, i) => {
+      el.style.animationDelay = 0.2 + i * 0.75 + 's';
+    });
+
+    function showFinal() {
+      goTo('final');
+      pets.classList.add('close', 'cheer');
+      setTimeout(() => pets.classList.remove('cheer'), 3000);
+    }
+
+    document.getElementById('replay').addEventListener('click', () => {
+      moonEl.classList.remove('full');
+      pets.classList.remove('close', 'cheer');
+      menuMsg.textContent = '';
+      setMoon(0.12);
+      goTo('title');
+    });
+
+    function celebrate() {
+      const rect = box.getBoundingClientRect();
+      burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 280);
+      setTimeout(() => burstConfetti(innerWidth * 0.15, innerHeight * 0.7, 160), 160);
+      setTimeout(() => burstConfetti(innerWidth * 0.85, innerHeight * 0.7, 160), 300);
+      setTimeout(() => burstConfetti(innerWidth * 0.5, innerHeight * 0.25, 200), 460);
+    }
+
+    function burstConfetti(cx, cy, count) {
+      const colors = ['#e94560', '#4ecca3', '#f1f1f1', '#f9c74f', '#577590', '#f3722c', '#b8c1cc', '#c77dff'];
+      const parts = [];
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        const size = 5 + Math.random() * 7;
+        el.style.width = size + 'px';
+        el.style.height = size * (0.4 + Math.random() * 0.9) + 'px';
+        el.style.background = colors[(Math.random() * colors.length) | 0];
+        if (Math.random() < 0.25) el.style.borderRadius = '50%';
+        document.body.appendChild(el);
+
+        const angle = Math.random() * Math.PI * 2;
+        const sp = 4 + Math.random() * 13;
+        parts.push({
+          el: el,
+          x: cx, y: cy,
+          vx: Math.cos(angle) * sp,
+          vy: Math.sin(angle) * sp - 6,
+          rot: Math.random() * 360,
+          vr: (Math.random() - 0.5) * 28,
+          life: 0,
+          max: 130 + Math.random() * 60
+        });
+      }
+
+      (function tick() {
+        let alive = false;
+        for (const p of parts) {
+          if (p.life > p.max) continue;
+          alive = true;
+          p.life++;
+          p.vy += 0.28;
+          p.vx *= 0.99;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          p.el.style.transform =
+            'translate(' + p.x + 'px,' + p.y + 'px) rotate(' + p.rot + 'deg)';
+          p.el.style.opacity = Math.max(0, 1 - p.life / p.max);
+        }
+        if (alive) {
+          requestAnimationFrame(tick);
+        } else {
+          parts.forEach(p => p.el.remove());
+        }
+      })();
+    }
+  </script>
+</body>
+</html>

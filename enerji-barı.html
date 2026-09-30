@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sana Özel Küçük Bir Mola</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1a1a2e;
+      color: #e94560;
+      font-family: 'Press Start 2P', monospace;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .pixel-box {
+      border: 4px solid #fff;
+      padding: 24px;
+      background: #16213e;
+      border-radius: 4px;
+      max-width: 400px;
+      box-shadow: 6px 6px 0px #0f3460;
+    }
+    .pets {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+    .pixel {
+      position: relative;
+    }
+    #heart { animation: beat 1.2s ease-in-out infinite; }
+    #panda { animation: bob 2.2s ease-in-out infinite; }
+    #koala { animation: bob 2.2s ease-in-out 1.1s infinite; }
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    p {
+      color: #f1f1f1;
+      font-size: 11px;
+      line-height: 1.8;
+    }
+    #bar-wrap {
+      display: none;
+      margin-top: 18px;
+    }
+    .bar-track {
+      border: 3px solid #fff;
+      background: #0f3460;
+      height: 20px;
+      padding: 3px;
+    }
+    .bar-fill {
+      width: 0%;
+      height: 100%;
+      background: #4ecca3;
+      box-shadow: inset -4px 0 0 rgba(0, 0, 0, 0.3);
+    }
+    #percent {
+      color: #4ecca3;
+      font-size: 10px;
+      margin-top: 10px;
+    }
+    .confetti {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 8px;
+      height: 8px;
+      pointer-events: none;
+      z-index: 999;
+    }
+    button {
+      background: #e94560;
+      color: #fff;
+      border: 3px solid #fff;
+      font-family: inherit;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 10px;
+      margin-top: 15px;
+      box-shadow: 3px 3px 0px #fff;
+    }
+    button:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #fff;
+    }
+    #note {
+      display: none;
+      color: #4ecca3;
+      margin-top: 15px;
+      font-size: 10px;
+    }
+    .home {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 10;
+      padding: 8px 10px;
+      border: 3px solid #fff;
+      background: #16213e;
+      color: #f1f1f1;
+      font-size: 8px;
+      text-decoration: none;
+      box-shadow: 3px 3px 0 #0f3460;
+    }
+    .home:hover, .home:focus-visible { outline: none; border-color: #4ecca3; color: #4ecca3; }
+    .home:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #0f3460; }
+    @media (max-width: 480px) {
+      body { padding-top: 64px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="home" href="index.html">◄ MENÜ</a>
+  <div class="pixel-box">
+    <div class="pets">
+      <div class="pixel" id="panda"></div>
+      <div class="pixel" id="heart"></div>
+      <div class="pixel" id="koala"></div>
+    </div>
+    <p>Günün biraz yorucu geçmiş olabilir ama enerjini tazelemek için buradayım!</p>
+    <button id="btn">✨ Enerji Al</button>
+    <div id="bar-wrap">
+      <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+      <div id="percent">🔋 Enerji Barı: %0</div>
+    </div>
+    <div id="note">⚡ Enerji tamamen doldu!<br><br>Bugün harika bir iş çıkardın, unutma. ❤️</div>
+  </div>
+
+  <script>
+    const PX = 7;
+
+    // Her karakter paletteki bir renge, nokta ise bos piksele karsilik gelir.
+    function drawPixelArt(id, rows, palette) {
+      const host = document.getElementById(id);
+      const shadows = [];
+      rows.forEach((row, y) => {
+        [...row].forEach((ch, x) => {
+          const color = palette[ch];
+          if (color) shadows.push(x * PX + 'px ' + y * PX + 'px ' + color);
+        });
+      });
+      host.style.width = rows[0].length * PX + 'px';
+      host.style.height = rows.length * PX + 'px';
+      const dot = document.createElement('i');
+      dot.style.cssText =
+        'position:absolute;left:0;top:0;width:' + PX + 'px;height:' + PX +
+        'px;box-shadow:' + shadows.join(',');
+      host.appendChild(dot);
+    }
+
+    drawPixelArt('heart', [
+      '.XX...XX.',
+      'XXXX.XXXX',
+      'XXXXXXXXX',
+      'XXXXXXXXX',
+      '.XXXXXXX.',
+      '..XXXXX..',
+      '...XXX...',
+      '....X....'
+    ], { X: '#e94560' });
+
+    drawPixelArt('panda', [
+      'KK.....KK',
+      'KKWWWWWKK',
+      '.WWWWWWW.',
+      '.KKWWWKK.',
+      '.KKWWWKK.',
+      '.WWWKWWW.',
+      '.WWWWWWW.',
+      '..WWWWW..'
+    ], { K: '#3d3d5c', W: '#f1f1f1' });
+
+    drawPixelArt('koala', [
+      'GG.....GG',
+      'GLG...GLG',
+      'GGGGGGGGG',
+      '.GGGGGGG.',
+      '.GDGGGDG.',
+      '.GGNNNGG.',
+      '..GGNGG..',
+      '...GGG...'
+    ], { G: '#b8c1cc', L: '#e5c1cf', D: '#3d3d5c', N: '#5a6472' });
+
+    const btn = document.getElementById('btn');
+    const box = document.querySelector('.pixel-box');
+    const wrap = document.getElementById('bar-wrap');
+    const fill = document.getElementById('bar-fill');
+    const percent = document.getElementById('percent');
+    const note = document.getElementById('note');
+
+    let running = false;
+
+    btn.addEventListener('click', () => {
+      if (running) return;
+      running = true;
+      btn.disabled = true;
+      note.style.display = 'none';
+      wrap.style.display = 'block';
+
+      let value = 0;
+      let speed = 0.08;
+      let last = performance.now();
+
+      function step(now) {
+        const dt = Math.min(now - last, 50);
+        last = now;
+        speed *= 1 + dt / 900; // dolum hizlandikca artar
+        value = Math.min(100, value + speed * dt / 16.67);
+
+        fill.style.width = value + '%';
+        percent.textContent = '🔋 Enerji Barı: %' + Math.floor(value);
+
+        const amp = (value / 100) * 7;
+        box.style.transform =
+          'translate(' + (Math.random() - 0.5) * 2 * amp + 'px,' +
+          (Math.random() - 0.5) * 2 * amp + 'px)';
+
+        if (value < 100) {
+          requestAnimationFrame(step);
+        } else {
+          box.style.transform = '';
+          note.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = '✨ Tekrar Enerji Al';
+          running = false;
+          celebrate();
+        }
+      }
+      requestAnimationFrame(step);
+    });
+
+    function celebrate() {
+      const rect = box.getBoundingClientRect();
+      burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 280);
+      setTimeout(() => burstConfetti(innerWidth * 0.15, innerHeight * 0.7, 160), 160);
+      setTimeout(() => burstConfetti(innerWidth * 0.85, innerHeight * 0.7, 160), 300);
+      setTimeout(() => burstConfetti(innerWidth * 0.5, innerHeight * 0.25, 200), 460);
+    }
+
+    function burstConfetti(cx, cy, count) {
+      const colors = ['#e94560', '#4ecca3', '#f1f1f1', '#f9c74f', '#577590', '#f3722c', '#b8c1cc', '#c77dff'];
+      const parts = [];
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        const size = 5 + Math.random() * 7;
+        el.style.width = size + 'px';
+        el.style.height = size * (0.4 + Math.random() * 0.9) + 'px';
+        el.style.background = colors[(Math.random() * colors.length) | 0];
+        if (Math.random() < 0.25) el.style.borderRadius = '50%';
+        document.body.appendChild(el);
+
+        const angle = Math.random() * Math.PI * 2;
+        const sp = 4 + Math.random() * 13;
+        parts.push({
+          el: el,
+          x: cx, y: cy,
+          vx: Math.cos(angle) * sp,
+          vy: Math.sin(angle) * sp - 6,
+          rot: Math.random() * 360,
+          vr: (Math.random() - 0.5) * 28,
+          life: 0,
+          max: 130 + Math.random() * 60
+        });
+      }
+
+      (function tick() {
+        let alive = false;
+        for (const p of parts) {
+          if (p.life > p.max) continue;
+          alive = true;
+          p.life++;
+          p.vy += 0.28;
+          p.vx *= 0.99;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          p.el.style.transform =
+            'translate(' + p.x + 'px,' + p.y + 'px) rotate(' + p.rot + 'deg)';
+          p.el.style.opacity = Math.max(0, 1 - p.life / p.max);
+        }
+        if (alive) {
+          requestAnimationFrame(tick);
+        } else {
+          parts.forEach(p => p.el.remove());
+        }
+      })();
+    }
+  </script>
+</body>
+</html>
