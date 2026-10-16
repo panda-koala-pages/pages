@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>16 Ekim · Bal Panda</title>
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="description" content="Bugün senin günün.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="16 Ekim · Bal Panda">
+  <meta property="og:description" content="Bugün senin günün.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body {
+      background-color: #1a1a2e;
+      color: #e94560;
+      font-family: 'Press Start 2P', monospace;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      padding: 20px;
+      overflow-x: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .star {
+      position: fixed;
+      background: #f1f1f1;
+      pointer-events: none;
+      animation: twinkle 3s steps(3) infinite;
+    }
+    #fx {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+      pointer-events: none;
+      image-rendering: pixelated;
+    }
+    .pixel-box {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      border: 4px solid #fff;
+      padding: 24px 20px;
+      background: #16213e;
+      border-radius: 4px;
+      box-shadow: 6px 6px 0 #0f3460;
+    }
+    .px-dot { position: absolute; left: 0; top: 0; display: block; }
+    .pixel { position: relative; }
+
+    /* --- Panda ve balonlar --- */
+    .pets {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 22px;
+      margin-bottom: 22px;
+    }
+    #panda { cursor: pointer; animation: bob 2.2s ease-in-out infinite; }
+    #panda.hop { animation: hop 0.45s steps(3); }
+    .pets.cheer #panda { animation: hop 0.5s steps(3) 5; }
+    .bal {
+      position: relative;
+      cursor: pointer;
+      transition: opacity 0.9s steps(6), transform 0.9s steps(6);
+    }
+    .bal.instant { transition: none; }
+    .bal.away { opacity: 0; transform: translateY(70px); pointer-events: none; }
+    .bal.popped { visibility: hidden; pointer-events: none; }
+    .bal-in { position: relative; animation: float 3.2s ease-in-out infinite; transform-origin: 50% 100%; }
+    #b2 .bal-in { animation-delay: -1.6s; }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes hop {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-4deg); }
+      50% { transform: translateY(-8px) rotate(4deg); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.8; }
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes stamp {
+      from { opacity: 0; transform: scale(3); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes floatUp {
+      to { opacity: 0; transform: translateY(-56px); }
+    }
+
+    .scene { display: none; }
+    .scene.active { display: block; animation: rise 0.5s steps(5); }
+    .fade-in { animation: rise 0.6s steps(4) both; }
+    h2 {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #f1f1f1;
+      margin: 0 0 14px;
+    }
+    .lead {
+      margin: 0 0 18px;
+      font-family: 'VT323', monospace;
+      font-size: 21px;
+      line-height: 1.1;
+      color: #b8c1cc;
+    }
+    .hint {
+      margin-top: 16px;
+      font-size: 7px;
+      color: #5a6472;
+    }
+    .hint.blink { animation: blink 1.2s steps(1) infinite; }
+
+    .btn {
+      background: #e94560;
+      color: #fff;
+      border: 3px solid #fff;
+      font-family: inherit;
+      font-size: 10px;
+      padding: 12px 16px;
+      margin-top: 18px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #fff;
+    }
+    .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #fff; }
+    .btn:disabled { opacity: 0.6; cursor: default; }
+    .btn.alt { background: #577590; }
+
+    /* --- Takvim --- */
+    .cal {
+      position: relative;
+      width: 196px;
+      margin: 0 auto;
+      cursor: pointer;
+      user-select: none;
+    }
+    .cal:focus { outline: none; }
+    .cal:focus-visible .cal-body { box-shadow: 0 0 0 3px #4ecca3; }
+    .cal.torn { cursor: default; }
+    .cal-rings {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 44px;
+      height: 10px;
+      margin-bottom: -6px;
+    }
+    .cal-rings i {
+      width: 10px;
+      height: 16px;
+      background: #b8c1cc;
+      border: 3px solid #fff;
+    }
+    .cal-head {
+      border: 4px solid #fff;
+      border-bottom: none;
+      background: #e94560;
+      color: #fff;
+      font-size: 10px;
+      padding: 14px 0 10px;
+    }
+    .cal-body {
+      position: relative;
+      height: 150px;
+      border: 4px solid #fff;
+      border-top: none;
+      background: #f1f1f1;
+      box-shadow: 6px 6px 0 #0f3460;
+    }
+    .sheet {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f1f1f1;
+      color: #1a1a2e;
+    }
+    .sheet.top {
+      z-index: 2;
+      border-top: 3px dashed #b8c1cc;
+      transform-origin: 0 0;
+    }
+    .sheet.top.torn { animation: tear 0.9s steps(7) forwards; pointer-events: none; }
+    @keyframes tear {
+      20% { transform: rotate(-7deg); opacity: 1; }
+      100% { transform: translate(-40px, 260px) rotate(-38deg); opacity: 0; }
+    }
+    .day { font-size: 52px; line-height: 1; }
+    .wk { margin-top: 12px; font-size: 9px; color: #5a6472; }
+    .under .day { color: #e94560; }
+    .scribble {
+      margin-top: 10px;
+      font-family: 'VT323', monospace;
+      font-size: 19px;
+      color: #e94560;
+      transform: rotate(-4deg);
+    }
+    .cal-stamp {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      width: 27px;
+      height: 24px;
+      opacity: 0;
+    }
+    .cal.torn .cal-stamp { animation: stamp 0.4s steps(4) 0.7s forwards; }
+    .logo {
+      margin-top: 26px;
+      font-size: 22px;
+      line-height: 1.5;
+      color: #f1f1f1;
+      text-shadow: 3px 3px 0 #e94560;
+    }
+    .chapter {
+      margin-top: 14px;
+      font-size: 9px;
+      color: #4ecca3;
+    }
+
+    /* --- Gokyuzu --- */
+    #sky {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      margin: 0 auto;
+      border: 3px solid #fff;
+      background: #0b1026;
+      image-rendering: pixelated;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 #0f3460;
+    }
+    #sky:focus { outline: none; }
+    #sky:focus-visible { box-shadow: 0 0 0 3px #4ecca3; }
+    .caption {
+      min-height: 64px;
+      margin-top: 14px;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      line-height: 1.1;
+      color: #b8c1cc;
+    }
+    .caption b {
+      display: block;
+      margin-bottom: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      font-weight: normal;
+      color: #f9c74f;
+    }
+    .caption .glyph {
+      margin-right: 8px;
+      font-family: 'Segoe UI Symbol', 'Apple Symbols', 'Noto Sans Symbols', sans-serif;
+      font-size: 18px;
+      vertical-align: -3px;
+    }
+    .panel {
+      border: 3px solid #fff;
+      background: #0f1a33;
+      padding: 16px 14px;
+      text-align: left;
+      font-family: 'VT323', monospace;
+      font-size: 21px;
+      line-height: 1.15;
+      color: #f1f1f1;
+    }
+    .panel p { margin: 0 0 10px; }
+    .panel p:last-child { margin-bottom: 0; }
+    .panel em { font-style: normal; color: #f9c74f; }
+    .panel-title {
+      margin-bottom: 12px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      line-height: 1.6;
+      color: #4ecca3;
+    }
+
+    /* --- Pasta --- */
+    .cake {
+      position: relative;
+      margin: 6px auto 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .cake:focus { outline: none; }
+    .flame {
+      position: absolute;
+      top: 0;
+      filter: drop-shadow(0 0 6px rgba(249, 199, 79, 0.85));
+      transform-origin: 50% 100%;
+    }
+    .flame.out { display: none; }
+    .flame .px-dot { animation: flick 0.3s steps(1) infinite; }
+    .flame .px-dot + .px-dot { animation-delay: -0.15s; }
+    @keyframes flick {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    .smoke {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #8d99ae;
+      pointer-events: none;
+      animation: smoke 1.3s steps(7) forwards;
+    }
+    @keyframes smoke {
+      to { opacity: 0; transform: translate(var(--dx), -46px); }
+    }
+    .lyrics {
+      min-height: 52px;
+      margin-top: 18px;
+      font-family: 'VT323', monospace;
+      font-size: 25px;
+      line-height: 1.1;
+      color: #5a6472;
+    }
+    .lyrics .on { color: #e94560; }
+    .lyrics .say { color: #f1f1f1; }
+    .small {
+      margin-top: 12px;
+      font-family: 'VT323', monospace;
+      font-size: 19px;
+      color: #8d99ae;
+    }
+
+    /* --- Kartlar --- */
+    .sub {
+      margin: -4px 0 18px;
+      font-family: 'VT323', monospace;
+      font-size: 19px;
+      color: #8d99ae;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .card {
+      position: relative;
+      height: 96px;
+      padding: 0;
+      border: 3px solid #fff;
+      background: #0f1a33;
+      color: #f1f1f1;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #0f3460;
+    }
+    .card:focus { outline: none; }
+    .card:focus-visible { border-color: #4ecca3; }
+    .card-back {
+      position: absolute;
+      inset: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed #3d5a80;
+    }
+    .card-front {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .card-name { font-size: 6px; line-height: 1; }
+    .card.open { border-color: #f9c74f; }
+    .card.open .card-back { display: none; }
+    .card.open .card-front { display: flex; }
+    .card.flip-out { animation: flipOut 0.16s steps(3) forwards; }
+    .card.flip-in { animation: flipIn 0.16s steps(3); }
+    @keyframes flipOut { to { transform: scaleX(0); } }
+    @keyframes flipIn { from { transform: scaleX(0); } }
+    .card.final {
+      display: block;
+      width: calc((100% - 24px) / 4);
+      margin: 16px auto 0;
+      border-color: #f9c74f;
+    }
+    .card.final:not(.open) { animation: glow 1s steps(1) infinite; }
+    @keyframes glow { 50% { border-color: #fff; } }
+    .reading { min-height: 140px; margin-top: 16px; }
+    .reading .panel-title { color: #f9c74f; }
+
+    /* --- Mektup --- */
+    .date {
+      margin-bottom: 14px;
+      font-family: 'VT323', monospace;
+      font-size: 19px;
+      color: #5a6472;
+      text-align: right;
+    }
+    .letter {
+      min-height: 200px;
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      line-height: 1.2;
+      color: #f1f1f1;
+      text-align: left;
+      cursor: pointer;
+    }
+    .letter p { margin: 0 0 12px; }
+    .letter p.typing::after {
+      content: '_';
+      color: #4ecca3;
+      animation: blink 0.8s steps(1) infinite;
+    }
+    .ending {
+      margin-top: 18px;
+      font-size: 13px;
+      line-height: 1.8;
+      color: #e94560;
+      text-shadow: 2px 2px 0 #0f3460;
+      visibility: hidden;
+    }
+    .ending.show { visibility: visible; animation: stamp 0.4s steps(4); }
+
+    .mini-heart {
+      position: fixed;
+      width: 27px;
+      height: 24px;
+      pointer-events: none;
+      z-index: 998;
+      animation: floatUp 1s steps(8) forwards;
+    }
+    .home {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 10;
+      padding: 8px 10px;
+      border: 3px solid #fff;
+      background: #16213e;
+      color: #f1f1f1;
+      font-size: 8px;
+      text-decoration: none;
+      box-shadow: 3px 3px 0 #0f3460;
+    }
+    .home:hover, .home:focus-visible { outline: none; border-color: #4ecca3; color: #4ecca3; }
+    .home:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #0f3460; }
+    @media (max-width: 480px) {
+      body { padding-top: 64px; }
+      .pixel-box { padding: 22px 14px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="home" href="index.html">◄ MENÜ</a>
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <main class="pixel-box">
+    <div class="pets" id="pets">
+      <div class="bal away" id="b1" title="balon"><div class="bal-in"></div></div>
+      <div class="pixel" id="panda" title="bal panda"></div>
+      <div class="bal away" id="b2" title="balon"><div class="bal-in"></div></div>
+    </div>
+
+    <section class="scene active" id="scene-cal">
+      <p class="lead" id="cal-lead">Önce takvimi bir güncelleyelim.</p>
+      <div class="cal" id="cal" role="button" tabindex="0" aria-label="Takvim yaprağını kopar">
+        <div class="cal-rings"><i></i><i></i></div>
+        <div class="cal-head">EKİM 2026</div>
+        <div class="cal-body">
+          <div class="sheet under">
+            <div class="cal-stamp" id="cal-stamp"></div>
+            <div class="day">16</div>
+            <div class="wk">CUMA</div>
+            <div class="scribble">Bal Panda'nın<br>doğum günü!</div>
+          </div>
+          <div class="sheet top" id="cal-page">
+            <div class="day">15</div>
+            <div class="wk">PERŞEMBE</div>
+          </div>
+        </div>
+      </div>
+      <div class="hint blink" id="cal-hint">YAPRAĞI KOPARMAK İÇİN DOKUN</div>
+      <div id="cal-after" hidden>
+        <div class="logo">İYİ Kİ<br>DOĞDUN</div>
+        <div class="chapter">ÖZEL BÖLÜM · BAL PANDA</div>
+        <button class="btn" id="start" type="button">BAŞLA ►</button>
+      </div>
+    </section>
+
+    <section class="scene" id="scene-sky">
+      <h2>GÖKYÜZÜNE BAK</h2>
+      <p class="lead" id="sky-lead">Bugün gökyüzünde senin burcun var. Yanıp sönen yıldızdan başla, sırayla birleştir.</p>
+      <canvas id="sky" width="80" height="72" tabindex="0" aria-label="Terazi takımyıldızı"></canvas>
+      <div class="caption" id="sky-cap" aria-live="polite"></div>
+      <div id="sky-reveal" hidden>
+        <div class="panel">
+          <div class="panel-title">GÜNEŞ DÖNÜŞÜ</div>
+          <p>Astrolojide doğum gününün bir adı daha var: <em>Güneş dönüşü.</em> Güneş, sen doğduğunda durduğu noktaya geri dönüyor ve yeni yılın haritası açılıyor.</p>
+          <p>İngilizcede de doğum günlerinde <em>"Many happy returns!"</em>  de denir.</p>
+          <p>İki farklı dil, aynı dilek: <em>Nice mutlu dönüşlere.</em></p>
+        </div>
+        <button class="btn" id="to-cake" type="button">DEVAM ►</button>
+      </div>
+    </section>
+
+    <section class="scene" id="scene-cake">
+      <h2>PASTA ZAMANI</h2>
+      <div class="cake" id="cake" role="button" tabindex="0" aria-label="Pasta ve mumlar"></div>
+      <div class="lyrics" id="lyrics" aria-live="polite"></div>
+      <button class="btn" id="wish" type="button" hidden>DİLEĞİMİ TUTTUM</button>
+      <div id="blow" hidden>
+        <button class="btn alt" id="mic" type="button">🎤 MİKROFONA ÜFLE</button>
+        <div class="small" id="blow-hint">ya da alevlere dokun</div>
+      </div>
+      <button class="btn" id="to-cards" type="button" hidden>DEVAM ►</button>
+    </section>
+
+    <section class="scene" id="scene-cards">
+      <h2>YENİ YAŞININ KARTLARI</h2>
+      <div class="sub">Hazırlayan: tamamen taraflı bir yorumcu</div>
+      <div class="cards" id="cards"></div>
+      <div class="panel reading" id="reading" aria-live="polite">
+        <div class="panel-title" id="reading-title"></div>
+        <div id="reading-text"></div>
+      </div>
+      <button class="card final" id="sun-card" type="button" hidden></button>
+      <button class="btn" id="to-letter" type="button" hidden>MEKTUBU OKU ►</button>
+    </section>
+
+    <section class="scene" id="scene-letter">
+      <div class="date">16 Ekim 2026</div>
+      <div class="letter" id="letter"></div>
+      <div class="ending" id="ending">İYİ Kİ DOĞDUN</div>
+      <button class="btn" id="replay" type="button" hidden>↺ BAŞTAN</button>
+    </section>
+  </main>
+
+  <script>
+    const PX = 7;
+    const $ = id => document.getElementById(id);
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const rand = (a, b) => a + Math.random() * (b - a);
+
+    // --- Piksel cizim yardimcilari ---
+    // Her karakter paletteki bir renge, nokta ise bos piksele karsilik gelir.
+    function pixelShadow(rows, palette, px) {
+      const out = [];
+      rows.forEach((row, y) => {
+        [...row].forEach((ch, x) => {
+          const color = palette[ch];
+          if (color) out.push(x * px + 'px ' + y * px + 'px ' + color);
+        });
+      });
+      return out.join(',');
+    }
+
+    function makeDot(px, shadow) {
+      const dot = document.createElement('i');
+      dot.className = 'px-dot';
+      dot.style.width = dot.style.height = px + 'px';
+      dot.style.boxShadow = shadow;
+      return dot;
+    }
+
+    function paint(host, rows, palette, px) {
+      host.style.width = rows[0].length * px + 'px';
+      host.style.height = rows.length * px + 'px';
+      host.innerHTML = '';
+      host.appendChild(makeDot(px, pixelShadow(rows, palette, px)));
+    }
+
+    // Merkezi (0,0) olan bir alanda pick(x, y) ile piksel sanati uretir.
+    function field(rx, ry, pick) {
+      const rows = [];
+      for (let y = -ry; y <= ry; y++) {
+        let row = '';
+        for (let x = -rx; x <= rx; x++) row += pick(x, y) || '.';
+        rows.push(row);
+      }
+      return rows;
+    }
+    const inDisc = (x, y, r) => x * x + y * y <= (r + 0.5) * (r + 0.5);
+    const shaded = (x, y, r) => (x + 1.3) * (x + 1.3) + (y + 1.3) * (y + 1.3) > (r + 0.3) * (r + 0.3);
+
+    const HEART = [
+      '.XX...XX.',
+      'XXXX.XXXX',
+      'XXXXXXXXX',
+      'XXXXXXXXX',
+      '.XXXXXXX.',
+      '..XXXXX..',
+      '...XXX...',
+      '....X....'
+    ];
+
+    const PANDA_FACE = [
+      'KKWWWWWKK',
+      '.WWWWWWW.',
+      '.KKWWWKK.',
+      '.KKWWWKK.',
+      '.BWWKWWB.',
+      '.WWWWWWW.',
+      '..WWWWW..'
+    ];
+    const PANDA_PLAIN = ['.........', '.........', '.........', 'KK.....KK'].concat(PANDA_FACE);
+    const PANDA_HAT = ['....Y....', '....P....', '...PYP...', 'KKPPPPPKK'].concat(PANDA_FACE);
+    const PANDA_PAL = { K: '#3d3d5c', W: '#f1f1f1', B: '#f4a6b8', P: '#e94560', Y: '#f9c74f' };
+
+    const BALLOON = [
+      '.XXXXX.',
+      'XHXXXXX',
+      'XHXXXXX',
+      'XXXXXXX',
+      'XXXXXXX',
+      '.XXXXX.',
+      '..XXX..',
+      '...X...',
+      '...S...',
+      '..S....',
+      '...S...',
+      '....S..'
+    ];
+
+    const pets = $('pets');
+    const panda = $('panda');
+
+    function drawPanda(hat) {
+      paint(panda, hat ? PANDA_HAT : PANDA_PLAIN, PANDA_PAL, PX);
+    }
+    drawPanda(false);
+
+    const BALLOONS = [
+      { el: $('b1'), main: '#e94560', light: '#ff9fb2' },
+      { el: $('b2'), main: '#4ecca3', light: '#b4f2dc' }
+    ];
+    BALLOONS.forEach(b => paint(b.el.firstElementChild, BALLOON, { X: b.main, H: b.light, S: '#5a6472' }, 5));
+
+    for (let i = 0; i < 48; i++) {
+      const s = document.createElement('div');
+      const size = Math.random() < 0.75 ? 2 : 3;
+      s.className = 'star';
+      s.style.width = s.style.height = size + 'px';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.animationDuration = 2 + Math.random() * 4 + 's';
+      s.style.animationDelay = -Math.random() * 6 + 's';
+      document.body.appendChild(s);
+    }
+
+    // --- Ses ---
+    let actx = null;
+
+    function initAudio() {
+      if (!actx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) actx = new AC();
+      }
+      if (actx && actx.state === 'suspended') actx.resume();
+    }
+
+    function beep(freq, dur = 0.05, vol = 0.035, type = 'square', when = 0) {
+      if (!actx) return;
+      const t = actx.currentTime + when;
+      const o = actx.createOscillator();
+      const g = actx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g);
+      g.connect(actx.destination);
+      o.start(t);
+      o.stop(t + dur + 0.02);
+    }
+
+    function jingle(notes, step = 0.1) {
+      notes.forEach((f, i) => beep(f, step * 1.6, 0.04, 'square', i * step));
+    }
+
+    function puff(vol = 0.06, dur = 0.25) {
+      if (!actx) return;
+      const n = Math.floor(actx.sampleRate * dur);
+      const buf = actx.createBuffer(1, n, actx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      const src = actx.createBufferSource();
+      const g = actx.createGain();
+      src.buffer = buf;
+      g.gain.value = vol;
+      src.connect(g);
+      g.connect(actx.destination);
+      src.start();
+    }
+
+    // --- Havai fisek ve kayan yildiz katmani ---
+    const fx = $('fx');
+    const fctx = fx.getContext('2d');
+    const FS = 3;
+    const FX_COLORS = ['#e94560', '#4ecca3', '#f9c74f', '#c77dff', '#f3722c', '#77b6ea'];
+    let sparks = [];
+    let rockets = [];
+    let meteors = [];
+    let fxOn = false;
+    let meteorTimer = 0;
+
+    function fitFx() {
+      fx.width = Math.ceil(innerWidth / FS);
+      fx.height = Math.ceil(innerHeight / FS);
+    }
+    fitFx();
+    addEventListener('resize', fitFx);
+
+    function kickFx() {
+      if (fxOn) return;
+      fxOn = true;
+      requestAnimationFrame(fxTick);
+    }
+
+    function burst(x, y, n, colors, power = 1) {
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2 + Math.random() * 0.3;
+        const sp = rand(0.5, 1.4) * power;
+        sparks.push({
+          x: x, y: y,
+          vx: Math.cos(a) * sp,
+          vy: Math.sin(a) * sp,
+          life: 0,
+          max: rand(40, 75),
+          c: colors[(Math.random() * colors.length) | 0]
+        });
+      }
+      kickFx();
+    }
+
+    function launch() {
+      rockets.push({
+        x: fx.width * rand(0.15, 0.85),
+        y: fx.height,
+        ty: fx.height * rand(0.12, 0.42),
+        c: FX_COLORS[(Math.random() * FX_COLORS.length) | 0]
+      });
+      beep(rand(300, 420), 0.25, 0.012, 'triangle');
+      kickFx();
+    }
+
+    function fireworks(count) {
+      for (let i = 0; i < count; i++) setTimeout(launch, i * 430 + Math.random() * 200);
+    }
+
+    function meteor() {
+      meteors.push({
+        x: fx.width * rand(0.35, 1.1),
+        y: fx.height * rand(-0.02, 0.3),
+        vx: -2.2,
+        vy: 1.1,
+        life: 0,
+        max: 75
+      });
+      kickFx();
+    }
+
+    function dot(x, y, c, a) {
+      fctx.globalAlpha = a;
+      fctx.fillStyle = c;
+      fctx.fillRect(Math.round(x), Math.round(y), 1, 1);
+    }
+
+    function fxTick() {
+      fctx.clearRect(0, 0, fx.width, fx.height);
+
+      rockets = rockets.filter(r => {
+        r.y -= 2.4;
+        r.x += (Math.random() - 0.5) * 0.4;
+        dot(r.x, r.y, '#f9c74f', 1);
+        dot(r.x, r.y + 1, '#f9c74f', 1);
+        dot(r.x, r.y + 3, '#f3722c', 0.5);
+        if (r.y > r.ty) return true;
+        burst(r.x, r.y, 44, [r.c, r.c, '#f1f1f1'], 1.1);
+        puff(0.035, 0.35);
+        return false;
+      });
+
+      sparks = sparks.filter(p => {
+        p.life++;
+        p.vy += 0.025;
+        p.vx *= 0.985;
+        p.vy *= 0.985;
+        p.x += p.vx;
+        p.y += p.vy;
+        if (Math.random() > 0.15) dot(p.x, p.y, p.c, Math.max(0, 1 - p.life / p.max));
+        return p.life < p.max;
+      });
+
+      meteors = meteors.filter(m => {
+        m.life++;
+        m.x += m.vx;
+        m.y += m.vy;
+        const fade = 1 - m.life / m.max;
+        for (let k = 0; k < 14; k++) {
+          dot(m.x - m.vx * k * 0.5, m.y - m.vy * k * 0.5, k ? '#b8c1cc' : '#ffffff', (1 - k / 14) * fade);
+        }
+        return m.life < m.max;
+      });
+
+      fctx.globalAlpha = 1;
+      if (rockets.length || sparks.length || meteors.length) {
+        requestAnimationFrame(fxTick);
+      } else {
+        fxOn = false;
+        fctx.clearRect(0, 0, fx.width, fx.height);
+      }
+    }
+
+    // --- Sahne yonetimi ---
+    let scene = 'cal';
+
+    function goTo(name) {
+      scene = name;
+      document.querySelectorAll('.scene').forEach(s => {
+        s.classList.toggle('active', s.id === 'scene-' + name);
+      });
+      window.scrollTo(0, 0);
+    }
+
+    function hop(el) {
+      el.classList.remove('hop');
+      void el.offsetWidth;
+      el.classList.add('hop');
+    }
+
+    function cheer() {
+      pets.classList.remove('cheer');
+      void pets.offsetWidth;
+      pets.classList.add('cheer');
+      setTimeout(() => pets.classList.remove('cheer'), 2600);
+    }
+
+    const MINI_HEART = pixelShadow(HEART, { X: '#e94560' }, 3);
+
+    function floatHeart(el) {
+      const r = el.getBoundingClientRect();
+      const h = document.createElement('div');
+      h.className = 'mini-heart';
+      h.style.left = r.left + r.width / 2 - 13 + (Math.random() - 0.5) * 24 + 'px';
+      h.style.top = r.top - 20 + 'px';
+      h.appendChild(makeDot(3, MINI_HEART));
+      document.body.appendChild(h);
+      h.addEventListener('animationend', () => h.remove());
+    }
+
+    panda.addEventListener('click', () => {
+      initAudio();
+      hop(panda);
+      beep(392, 0.08, 0.03);
+      floatHeart(panda);
+    });
+    panda.addEventListener('animationend', e => {
+      if (e.animationName === 'hop') panda.classList.remove('hop');
+    });
+
+    function balloonsIn() {
+      BALLOONS.forEach((b, i) => setTimeout(() => b.el.classList.remove('away'), 200 + i * 250));
+    }
+
+    function balloonsOut() {
+      BALLOONS.forEach(b => {
+        b.el.classList.add('instant', 'away');
+        b.el.classList.remove('popped');
+        void b.el.offsetWidth;
+        b.el.classList.remove('instant');
+      });
+    }
+
+    BALLOONS.forEach(b => {
+      b.el.addEventListener('click', () => {
+        if (b.el.classList.contains('away') || b.el.classList.contains('popped')) return;
+        initAudio();
+        const r = b.el.getBoundingClientRect();
+        burst((r.left + r.width / 2) / FS, (r.top + r.height * 0.3) / FS, 18, [b.main, b.light], 0.8);
+        puff(0.09, 0.12);
+        beep(1400, 0.04, 0.03);
+        b.el.classList.add('popped');
+        setTimeout(() => {
+          b.el.classList.add('instant', 'away');
+          b.el.classList.remove('popped');
+          void b.el.offsetWidth;
+          b.el.classList.remove('instant', 'away');
+        }, 3000);
+      });
+    });
+
+    // --- 1. Takvim ---
+    const cal = $('cal');
+    const calPage = $('cal-page');
+    const calHint = $('cal-hint');
+    const calLead = $('cal-lead');
+    const calAfter = $('cal-after');
+    let torn = false;
+
+    paint($('cal-stamp'), HEART, { X: '#e94560' }, 3);
+
+    function tear() {
+      if (torn) return;
+      torn = true;
+      initAudio();
+      puff(0.05, 0.18);
+      beep(880, 0.05, 0.02);
+      cal.classList.add('torn');
+      calPage.classList.add('torn');
+      calHint.hidden = true;
+      setTimeout(() => {
+        drawPanda(true);
+        hop(panda);
+        jingle([523, 659, 784, 1047], 0.1);
+        balloonsIn();
+        calLead.hidden = true;
+        calAfter.hidden = false;
+        calAfter.classList.add('fade-in');
+      }, 700);
+    }
+
+    cal.addEventListener('click', tear);
+    cal.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        tear();
+      }
+    });
+
+    function resetCal() {
+      torn = false;
+      cal.classList.remove('torn');
+      calPage.classList.remove('torn');
+      calHint.hidden = false;
+      calLead.hidden = false;
+      calAfter.hidden = true;
+      drawPanda(false);
+      balloonsOut();
+    }
+
+    $('start').addEventListener('click', () => {
+      initAudio();
+      beep(660, 0.05, 0.03);
+      goTo('sky');
+      startSky();
+    });
+
+    // --- 2. Gokyuzu: Terazi takimyildizi ---
+    const sky = $('sky');
+    const sctx = sky.getContext('2d');
+    const SW = sky.width;
+    const SH = sky.height;
+    const skyCap = $('sky-cap');
+    const skyLead = $('sky-lead');
+    const skyReveal = $('sky-reveal');
+
+    // Gercek konumlardan (dogu solda) olceklenmis koordinatlar.
+    const LIBRA = [
+      { x: 12, y: 64, name: 'UPSILON LIBRAE', note: 'Terazinin sol kefesi.' },
+      { x: 14, y: 24, name: 'ZUBENELHAKRABİ', note: 'γ Lib · Adı "akrebin kıskacı" demek.' },
+      { x: 36, y: 8, name: 'ZUBENESCHAMALİ', note: 'β Lib · Çıplak gözle yeşil görünen tek yıldız olduğu söylenir.' },
+      { x: 68, y: 28, name: 'ZUBENELGENUBİ', note: 'α Lib · "Güney kıskacı".' },
+      { x: 52, y: 56, name: 'BRACHIUM', note: 'σ Lib · Latincede "kol". Terazinin sağ kefesi.' }
+    ];
+    const LIBRA_NOTES = [523, 587, 659, 784, 880];
+    const BG_STARS = [];
+    for (let i = 0; i < 46; i++) {
+      BG_STARS.push({ x: (Math.random() * SW) | 0, y: (Math.random() * SH) | 0, sp: rand(400, 1300), ph: rand(0, 6.3), b: Math.random() });
+    }
+
+    let linked = 0;
+    let skyDone = false;
+    let lineAnim = null;
+    let beamT0 = 0;
+    let skyRaf = 0;
+
+    function spx(x, y, c, a = 1) {
+      sctx.globalAlpha = a;
+      sctx.fillStyle = c;
+      sctx.fillRect(x, y, 1, 1);
+    }
+
+    function seg(a, b, p, c) {
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const n = Math.max(Math.abs(dx), Math.abs(dy));
+      const m = Math.floor(n * p);
+      for (let k = 0; k <= m; k++) spx(Math.round(a.x + dx * k / n), Math.round(a.y + dy * k / n), c);
+    }
+
+    function skyStar(s, c, r, glow) {
+      if (glow) {
+        [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([dx, dy]) => spx(s.x + dx, s.y + dy, c, 0.35));
+      }
+      spx(s.x, s.y, '#ffffff');
+      for (let k = 1; k <= r; k++) {
+        const a = k === 1 ? 1 : 0.55;
+        spx(s.x + k, s.y, c, a);
+        spx(s.x - k, s.y, c, a);
+        spx(s.x, s.y + k, c, a);
+        spx(s.x, s.y - k, c, a);
+      }
+    }
+
+    function drawSky(now) {
+      sctx.globalAlpha = 1;
+      sctx.fillStyle = '#0b1026';
+      sctx.fillRect(0, 0, SW, SH);
+
+      BG_STARS.forEach(s => {
+        const tw = 0.5 + 0.5 * Math.sin(now / s.sp + s.ph);
+        const a = tw > 0.66 ? 0.8 : tw > 0.33 ? 0.45 : 0.18;
+        spx(s.x, s.y, '#f1f1f1', a * (0.45 + s.b * 0.55));
+      });
+
+      const lineC = skyDone ? '#f9c74f' : '#4ecca3';
+      for (let i = 1; i < linked; i++) {
+        const p = lineAnim && lineAnim.i === i ? Math.min(1, (now - lineAnim.t0) / 320) : 1;
+        seg(LIBRA[i - 1], LIBRA[i], p, lineC);
+      }
+      if (beamT0) seg(LIBRA[1], LIBRA[3], Math.min(1, Math.max(0, now - beamT0) / 420), lineC);
+
+      LIBRA.forEach((s, i) => {
+        if (i < linked) skyStar(s, skyDone ? '#f9c74f' : '#f1f1f1', skyDone ? 2 : 1, skyDone);
+        else if (i === linked) skyStar(s, '#f9c74f', Math.floor(now / 350) % 2 ? 1 : 2, false);
+        else skyStar(s, '#5a6472', 1, false);
+      });
+      sctx.globalAlpha = 1;
+
+      if (scene === 'sky') skyRaf = requestAnimationFrame(drawSky);
+    }
+
+    function showCap(title, text) {
+      skyCap.innerHTML = '';
+      const b = document.createElement('b');
+      b.textContent = title;
+      skyCap.append(b, text);
+    }
+
+    function startSky() {
+      linked = 0;
+      skyDone = false;
+      lineAnim = null;
+      beamT0 = 0;
+      skyLead.hidden = false;
+      skyReveal.hidden = true;
+      skyCap.textContent = '';
+      cancelAnimationFrame(skyRaf);
+      skyRaf = requestAnimationFrame(drawSky);
+    }
+
+    function connectNext() {
+      if (skyDone || linked >= LIBRA.length) return;
+      initAudio();
+      const i = linked++;
+      if (i > 0) lineAnim = { i: i, t0: performance.now() };
+      beep(LIBRA_NOTES[i], 0.12, 0.035);
+      showCap(LIBRA[i].name, LIBRA[i].note);
+      if (linked === LIBRA.length) setTimeout(finishSky, 700);
+    }
+
+    function finishSky() {
+      beamT0 = performance.now();
+      beep(988, 0.1, 0.03);
+      setTimeout(() => {
+        skyDone = true;
+        jingle([659, 784, 988, 1319], 0.1);
+        hop(panda);
+        showCap('TERAZİ', 'Yönetici gezegeni Venüs. Denge, uyum, zarafet. Tanıdık geldi mi?');
+        const glyph = document.createElement('span');
+        glyph.className = 'glyph';
+        glyph.textContent = '♎\uFE0E';
+        skyCap.firstChild.prepend(glyph);
+        setTimeout(() => {
+          skyLead.hidden = true;
+          skyReveal.hidden = false;
+          skyReveal.classList.add('fade-in');
+        }, 1100);
+      }, 500);
+    }
+
+    sky.addEventListener('pointerdown', e => {
+      if (skyDone || linked >= LIBRA.length) return;
+      const r = sky.getBoundingClientRect();
+      const x = (e.clientX - r.left - sky.clientLeft) / sky.clientWidth * SW;
+      const y = (e.clientY - r.top - sky.clientTop) / sky.clientHeight * SH;
+      const near = s => Math.hypot(x - s.x, y - s.y) < 10;
+      if (near(LIBRA[linked])) {
+        connectNext();
+      } else if (LIBRA.some((s, i) => i > linked && near(s))) {
+        initAudio();
+        beep(110, 0.15, 0.04);
+        showCap('ACELE YOK', 'Önce yanıp sönen yıldız.');
+      }
+    });
+    sky.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        connectNext();
+      }
+    });
+
+    $('to-cake').addEventListener('click', () => {
+      beep(660, 0.05, 0.03);
+      cancelAnimationFrame(skyRaf);
+      goTo('cake');
+      startCake();
+    });
+
+    // --- 3. Pasta ---
+    const CAKE_PX = 7;
+    const CAKE = [
+      '......................',
+      '......................',
+      '......................',
+      '......................',
+      '.......K......K.......',
+      '......AAA.....E.......',
+      '........A....EE.......',
+      '.......AA.....E.......',
+      '........A.....E.......',
+      '......AAA....EEE......',
+      '...WWWWWWWWWWWWWWWW...',
+      '..WWWWWWWWWWWWWWWWWW..',
+      '..WWTWWWYWWWWTWWWYWW..',
+      '..BWWBBWWBBBWWBBWWBB..',
+      '..BBWBBBBBBBBWBBBBBB..',
+      '..BBBBBBBBBBBBBBBBBB..',
+      '..CCCCCCCCCCCCCCCCCC..',
+      '..BBBBBBBBBBBBBBBBBB..',
+      '..BBBBBBBBBBBBBBBBBB..',
+      '..DDDDDDDDDDDDDDDDDD..',
+      'PPPPPPPPPPPPPPPPPPPPPP',
+      '.QQQQQQQQQQQQQQQQQQQQ.'
+    ];
+    const CAKE_PAL = {
+      K: '#3d3d5c', A: '#4ecca3', E: '#f9c74f', W: '#f1f1f1', T: '#4ecca3', Y: '#f9c74f',
+      B: '#e94560', C: '#ffd6e0', D: '#b8324b', P: '#b8c1cc', Q: '#5a6472'
+    };
+    const WICKS = [7, 14];
+    const FLAME_A = ['.Y.', 'YYY', 'YOY', '.O.'];
+    const FLAME_B = ['..Y', '.YY', 'YOY', '.O.'];
+    const FLAME_PAL = { Y: '#f9c74f', O: '#f3722c' };
+
+    const cakeEl = $('cake');
+    const lyricsEl = $('lyrics');
+    const wishBtn = $('wish');
+    const blowBox = $('blow');
+    const micBtn = $('mic');
+    const blowHint = $('blow-hint');
+    const toCardsBtn = $('to-cards');
+    let flames = [];
+    let blowReady = false;
+    let songTok = 0;
+
+    paint(cakeEl, CAKE, CAKE_PAL, CAKE_PX);
+    WICKS.forEach(col => {
+      const f = document.createElement('div');
+      f.className = 'flame';
+      f.style.left = (col - 1) * CAKE_PX + 'px';
+      f.style.width = 3 * CAKE_PX + 'px';
+      f.style.height = 4 * CAKE_PX + 'px';
+      f.appendChild(makeDot(CAKE_PX, pixelShadow(FLAME_A, FLAME_PAL, CAKE_PX)));
+      f.appendChild(makeDot(CAKE_PX, pixelShadow(FLAME_B, FLAME_PAL, CAKE_PX)));
+      cakeEl.appendChild(f);
+      flames.push(f);
+    });
+
+    const NOTE = { G4: 392, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99 };
+    const SONG = [
+      [['G4', 0.75], ['G4', 0.25], ['A4', 1], ['G4', 1], ['C5', 1], ['B4', 2]],
+      [['G4', 0.75], ['G4', 0.25], ['A4', 1], ['G4', 1], ['D5', 1], ['C5', 2]],
+      [['G4', 0.75], ['G4', 0.25], ['G5', 1], ['E5', 1], ['C5', 1], ['B4', 1], ['A4', 2]],
+      [['F5', 0.75], ['F5', 0.25], ['E5', 1], ['C5', 1], ['D5', 1], ['C5', 2.5]]
+    ];
+    const LYRICS = [
+      ['Mut', 'lu ', 'yıl', 'lar ', 'sa', 'na'],
+      ['Mut', 'lu ', 'yıl', 'lar ', 'sa', 'na'],
+      ['Mut', 'lu ', 'yıl', 'lar ', 'Bal ', 'Pan', 'dam'],
+      ['Mut', 'lu ', 'yıl', 'lar ', 'sa', 'na']
+    ];
+    const BEAT = 0.36;
+
+    function showSyllable(line, idx) {
+      lyricsEl.innerHTML = '';
+      lyricsEl.append('♪ ');
+      LYRICS[line].forEach((syl, i) => {
+        const s = document.createElement('span');
+        s.textContent = syl;
+        if (i <= idx) s.className = 'on';
+        lyricsEl.appendChild(s);
+      });
+    }
+
+    function say(text) {
+      lyricsEl.innerHTML = '';
+      const s = document.createElement('span');
+      s.className = 'say';
+      s.textContent = text;
+      lyricsEl.appendChild(s);
+    }
+
+    function playSong(onDone) {
+      const tok = ++songTok;
+      let t = 0.6;
+      SONG.forEach((line, li) => {
+        line.forEach(([n, b], si) => {
+          const dur = b * BEAT * 0.92;
+          beep(NOTE[n], dur, 0.03, 'square', t);
+          beep(NOTE[n] / 2, dur, 0.04, 'triangle', t);
+          setTimeout(() => { if (tok === songTok) showSyllable(li, si); }, t * 1000);
+          t += b * BEAT;
+        });
+      });
+      setTimeout(() => { if (tok === songTok) onDone(); }, (t + 0.5) * 1000);
+    }
+
+    function startCake() {
+      stopMic();
+      blowReady = false;
+      flames.forEach(f => {
+        f.classList.remove('out');
+        f.style.transform = '';
+      });
+      wishBtn.hidden = true;
+      blowBox.hidden = true;
+      toCardsBtn.hidden = true;
+      micBtn.disabled = false;
+      micBtn.textContent = '🎤 MİKROFONA ÜFLE';
+      blowHint.textContent = 'ya da alevlere dokun';
+      lyricsEl.textContent = '♪';
+      playSong(() => {
+        say('Şimdi gözlerini kapat ve bir dilek tut.');
+        wishBtn.hidden = false;
+        wishBtn.classList.add('fade-in');
+      });
+    }
+
+    wishBtn.addEventListener('click', () => {
+      beep(784, 0.08, 0.03);
+      wishBtn.hidden = true;
+      say('Hazır olduğunda mumları üfle.');
+      blowReady = true;
+      blowBox.hidden = false;
+      blowBox.classList.add('fade-in');
+    });
+
+    const litFlames = () => flames.filter(f => !f.classList.contains('out'));
+
+    function extinguishNext() {
+      const f = litFlames()[0];
+      if (!f) return;
+      f.classList.add('out');
+      puff(0.07, 0.3);
+      for (let i = 0; i < 3; i++) {
+        const s = document.createElement('div');
+        s.className = 'smoke';
+        s.style.left = f.offsetLeft + CAKE_PX + 'px';
+        s.style.top = f.offsetTop + CAKE_PX * 2 + 'px';
+        s.style.setProperty('--dx', (i - 1) * 8 + 'px');
+        s.style.animationDelay = i * 0.15 + 's';
+        cakeEl.appendChild(s);
+        s.addEventListener('animationend', () => s.remove());
+      }
+      if (!litFlames().length) allOut();
+    }
+
+    function allOut() {
+      blowReady = false;
+      stopMic();
+      blowBox.hidden = true;
+      say('...');
+      setTimeout(() => {
+        fireworks(7);
+        cheer();
+        jingle([523, 659, 784, 1047, 784, 1047], 0.11);
+        say('Dilek alındı!');
+        toCardsBtn.hidden = false;
+        toCardsBtn.classList.add('fade-in');
+      }, 700);
+    }
+
+    cakeEl.addEventListener('click', () => {
+      if (blowReady) extinguishNext();
+    });
+    cakeEl.addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ' ') && blowReady) {
+        e.preventDefault();
+        extinguishNext();
+      }
+    });
+
+    // Mikrofon: sesin siddeti belli bir sure esigi asarsa "ufleme" sayilir.
+    let micStream = null;
+    let micRaf = 0;
+
+    function micFail() {
+      micBtn.disabled = true;
+      micBtn.textContent = '🎤 KAPALI';
+      blowHint.textContent = 'Mikrofon açılamadı. Alevlere dokunman yeterli.';
+    }
+
+    function leanFlames(level) {
+      const k = Math.min(1, level * 6);
+      litFlames().forEach(f => {
+        f.style.transform = k > 0.05 ? 'skewX(' + (-k * 28) + 'deg) scaleY(' + (1 - k * 0.3) + ')' : '';
+      });
+    }
+
+    async function startMic() {
+      initAudio();
+      if (!actx || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        micFail();
+        return;
+      }
+      micBtn.disabled = true;
+      micBtn.textContent = 'İZİN BEKLENİYOR...';
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+        });
+      } catch (err) {
+        micFail();
+        return;
+      }
+      if (!blowReady) {
+        stopMic();
+        return;
+      }
+      micBtn.textContent = '🎤 DİNLİYORUM...';
+      blowHint.textContent = 'Şimdi üfle!';
+      const src = actx.createMediaStreamSource(micStream);
+      const an = actx.createAnalyser();
+      const mute = actx.createGain();
+      an.fftSize = 1024;
+      mute.gain.value = 0;
+      src.connect(an);
+      an.connect(mute);
+      mute.connect(actx.destination);
+      const buf = new Uint8Array(an.fftSize);
+      let blow = 0;
+      let level = 0;
+      let last = performance.now();
+
+      (function loop(now) {
+        if (!micStream) return;
+        const dt = Math.min(64, Math.max(0, now - last));
+        last = now;
+        an.getByteTimeDomainData(buf);
+        let sum = 0;
+        for (let i = 0; i < buf.length; i++) {
+          const v = (buf[i] - 128) / 128;
+          sum += v * v;
+        }
+        const rms = Math.sqrt(sum / buf.length);
+        level = level * 0.7 + rms * 0.3;
+        leanFlames(level);
+        blow = rms > 0.13 ? blow + dt : Math.max(0, blow - dt);
+        if (blow > 260) {
+          blow = 0;
+          extinguishNext();
+        }
+        if (micStream) micRaf = requestAnimationFrame(loop);
+      })(last);
+    }
+
+    function stopMic() {
+      cancelAnimationFrame(micRaf);
+      if (micStream) micStream.getTracks().forEach(t => t.stop());
+      micStream = null;
+      leanFlames(0);
+    }
+
+    micBtn.addEventListener('click', startMic);
+
+    toCardsBtn.addEventListener('click', () => {
+      beep(660, 0.05, 0.03);
+      goTo('cards');
+      startCards();
+    });
+
+    // --- 4. Kartlar ---
+    const VENUS = field(5, 5, (x, y) => !inDisc(x, y, 5) ? 0
+      : (x === -2 && y === -3) || (x === -3 && y === -2) ? 'H'
+      : shaded(x, y, 5) ? 'S' : 'A');
+    const MERCURY = field(4, 4, (x, y) => !inDisc(x, y, 4) ? 0
+      : ['1,-2', '-2,0', '0,2', '2,1'].includes(x + ',' + y) || shaded(x, y, 4) ? 'S' : 'A');
+    const JUPITER = field(6, 6, (x, y) => {
+      if (!inDisc(x, y, 6)) return 0;
+      if ((x === 2 || x === 3) && y === 2) return 'R';
+      if (shaded(x, y, 6)) return 'S';
+      return y === -3 || y === -2 || y === 1 || y === 3 ? 'B' : y === 0 ? 'L' : 'A';
+    });
+    const SATURN = field(7, 4, (x, y) => {
+      const u = x * 0.97 + y * 0.26;
+      const v = -x * 0.26 + y * 0.97;
+      const e = (u / 7) * (u / 7) + (v / 1.6) * (v / 1.6);
+      const body = inDisc(x, y, 3.4);
+      if (e > 0.55 && e < 1.25 && (v > 0 || !body)) return 'R';
+      if (body) return shaded(x, y, 3.4) ? 'S' : 'A';
+      return 0;
+    });
+    const SUN = field(6, 6, (x, y) => {
+      if (inDisc(x, y, 3.4)) return shaded(x, y, 3.4) ? 'S' : 'A';
+      const ray = (x === 0 && Math.abs(y) >= 5) || (y === 0 && Math.abs(x) >= 5) ||
+        (Math.abs(x) === 4 && Math.abs(y) === 4);
+      return ray ? 'A' : 0;
+    });
+    const CARD_BACK = [
+      '...Y...',
+      '...Y...',
+      '..YYY..',
+      'YYYWYYY',
+      '..YYY..',
+      '...Y...',
+      '...Y...'
+    ];
+
+    const CARDS = [
+      {
+        name: 'VENÜS', title: 'VENÜS · BURCUNUN YÖNETİCİSİ', art: VENUS,
+        pal: { A: '#f4d58d', S: '#d9a85b', H: '#fff3c4' },
+        text: 'Kısa süre önce hayatına giren biri, seni sandığından çok daha sık düşünüyor. Kaynak güvenilir. Yorumcu bu konuda biraz taraflı.'
+      },
+      {
+        name: 'MERKÜR', title: 'MERKÜR · KELİMELER', art: MERCURY,
+        pal: { A: '#b8c1cc', S: '#8d99ae' },
+        text: 'Her gün birilerine yeni bir dilin kapısını açıyorsun. Bu yıl da bir öğrencin, senin sayende kendini ilk kez başka bir dilde anlatabilecek.'
+      },
+      {
+        name: 'SATÜRN', title: 'SATÜRN · SINAVLAR', art: SATURN,
+        pal: { A: '#f1d38a', S: '#c9a05a', R: '#b8a27a' },
+        text: 'Satürn dönüşün geride kaldı. Zor sınavlar bitti, karneler dağıtıldı. Senin karnende takdirname var; kontrol ettim.'
+      },
+      {
+        name: 'JÜPİTER', title: 'JÜPİTER · ŞANS', art: JUPITER,
+        pal: { A: '#e0b98a', B: '#c98b5a', L: '#f1dcc0', S: '#a86f45', R: '#e94560' },
+        text: 'Bu yıl, uzun zamandır beklediğin bir kapı aralanacak. Aralanmazsa dert etme; birlikte iteriz.'
+      }
+    ];
+    const SUN_CARD = {
+      name: 'GÜNEŞ', title: 'GÜNEŞ · SEN', art: SUN,
+      pal: { A: '#f9c74f', S: '#f3722c' },
+      text: 'Haritanın merkezi. Son kart sensin. Gerisini bir mektuba yazdım.'
+    };
+
+    const cardsEl = $('cards');
+    const readTitle = $('reading-title');
+    const readText = $('reading-text');
+    const sunCard = $('sun-card');
+    const toLetterBtn = $('to-letter');
+    const TYPE_MS = 28;
+    let typeTok = 0;
+    let opened = 0;
+    let cardTimer = 0;
+
+    function typeReading(d) {
+      const tok = ++typeTok;
+      readTitle.textContent = d.title;
+      readText.textContent = '';
+      let n = 0;
+      const timer = setInterval(() => {
+        if (tok !== typeTok) {
+          clearInterval(timer);
+          return;
+        }
+        n++;
+        readText.textContent = d.text.slice(0, n);
+        if (n % 3 === 0 && d.text[n - 1] !== ' ') beep(330 * rand(0.95, 1.05), 0.03, 0.015);
+        if (n >= d.text.length) clearInterval(timer);
+      }, TYPE_MS);
+    }
+
+    // Kart baska bir kart acilip yazisi yarida kessa bile akisin ilerlemesi icin
+    // sonraki adim yazinin bitmesine degil, okuma suresine baglanir.
+    function afterReading(d, fn) {
+      clearTimeout(cardTimer);
+      cardTimer = setTimeout(fn, d.text.length * TYPE_MS + 800);
+    }
+
+    function fillCard(btn, d) {
+      btn.innerHTML = '';
+      const back = document.createElement('span');
+      const backArt = document.createElement('span');
+      const front = document.createElement('span');
+      const art = document.createElement('span');
+      const name = document.createElement('span');
+      back.className = 'card-back';
+      backArt.className = 'pixel';
+      front.className = 'card-front';
+      art.className = 'pixel';
+      name.className = 'card-name';
+      name.textContent = d.name;
+      paint(backArt, CARD_BACK, { Y: '#3d5a80', W: '#b8c1cc' }, 3);
+      paint(art, d.art, d.pal, 3);
+      back.appendChild(backArt);
+      front.append(art, name);
+      btn.append(back, front);
+      btn.classList.remove('open', 'flip-out', 'flip-in');
+      btn.setAttribute('aria-label', 'Kapalı kart');
+    }
+
+    function flip(btn, d, onOpen) {
+      initAudio();
+      if (btn.classList.contains('open')) {
+        typeReading(d);
+        return;
+      }
+      if (btn.classList.contains('flip-out')) return;
+      beep(523, 0.05, 0.03);
+      btn.classList.add('flip-out');
+      setTimeout(() => {
+        btn.classList.remove('flip-out');
+        btn.classList.add('open', 'flip-in');
+        btn.setAttribute('aria-label', d.name);
+        beep(784, 0.08, 0.03);
+        typeReading(d);
+        if (onOpen) onOpen();
+      }, 170);
+    }
+
+    function startCards() {
+      opened = 0;
+      typeTok++;
+      clearTimeout(cardTimer);
+      cardsEl.innerHTML = '';
+      CARDS.forEach(d => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'card';
+        fillCard(btn, d);
+        btn.addEventListener('click', () => {
+          flip(btn, d, () => {
+            if (++opened < CARDS.length) return;
+            afterReading(d, () => {
+              sunCard.hidden = false;
+              sunCard.classList.add('fade-in');
+            });
+          });
+        });
+        cardsEl.appendChild(btn);
+      });
+      fillCard(sunCard, SUN_CARD);
+      sunCard.hidden = true;
+      toLetterBtn.hidden = true;
+      readTitle.textContent = '';
+      readText.textContent = 'Dört kart, dört gezegen. İstediğinden başla.';
+    }
+
+    sunCard.addEventListener('click', () => {
+      flip(sunCard, SUN_CARD, () => {
+        hop(panda);
+        afterReading(SUN_CARD, () => {
+          toLetterBtn.hidden = false;
+          toLetterBtn.classList.add('fade-in');
+        });
+      });
+    });
+
+    toLetterBtn.addEventListener('click', () => {
+      typeTok++;
+      clearTimeout(cardTimer);
+      beep(660, 0.05, 0.03);
+      goTo('letter');
+      startLetter();
+    });
+
+    // --- 5. Mektup ---
+    const LETTER = [
+      'Bal Pandam,',
+      'Takvimde bazı günler artık diğerlerinden daha belirgin duruyor. Bugün ise hepsinden önemlisi.',
+      '31 yıl önce bugün, bir pazartesi doğmuşsun. Haftanın en sevilmeyen gününden çıkan en güzel şey bence sensin.',
+      'Yeni yaşın sana huzur, bolca kahkaha ve hak ettiğin her güzel şeyi getirsin. Ben de bu yaşın olabildiğince çok gününde yanında olmak istiyorum.'
+    ];
+    const letterEl = $('letter');
+    const endingEl = $('ending');
+    const replayBtn = $('replay');
+    let letterTok = 0;
+    let letterSkip = false;
+
+    async function startLetter() {
+      const tok = ++letterTok;
+      letterSkip = false;
+      letterEl.innerHTML = '';
+      endingEl.classList.remove('show');
+      replayBtn.hidden = true;
+      meteor();
+      clearInterval(meteorTimer);
+      meteorTimer = setInterval(() => { if (Math.random() < 0.7) meteor(); }, 2600);
+      await sleep(500);
+
+      for (const text of LETTER) {
+        if (tok !== letterTok) return;
+        const p = document.createElement('p');
+        p.className = 'typing';
+        letterEl.appendChild(p);
+        for (let n = 1; n <= text.length; n++) {
+          if (tok !== letterTok) return;
+          if (letterSkip) {
+            p.textContent = text;
+            break;
+          }
+          p.textContent = text.slice(0, n);
+          await sleep(/[.,]/.test(text[n - 1]) ? 170 : 24);
+        }
+        p.classList.remove('typing');
+        if (!letterSkip) await sleep(380);
+      }
+      if (tok !== letterTok) return;
+
+      await sleep(300);
+      endingEl.classList.add('show');
+      cheer();
+      jingle([523, 659, 784, 1047], 0.12);
+      const er = endingEl.getBoundingClientRect();
+      burst((er.left + er.width / 2) / FS, (er.top + er.height / 2) / FS, 60, FX_COLORS, 1.3);
+      await sleep(1500);
+      if (tok !== letterTok) return;
+      replayBtn.hidden = false;
+      replayBtn.classList.add('fade-in');
+    }
+
+    letterEl.addEventListener('click', () => { letterSkip = true; });
+
+    replayBtn.addEventListener('click', () => {
+      letterTok++;
+      clearInterval(meteorTimer);
+      resetCal();
+      goTo('cal');
+    });
+
+    const TITLE = document.title;
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        document.title = TITLE;
+        return;
+      }
+      document.title = scene === 'cake' && litFlames().length ? 'Mumlar eriyor...' : 'Parti seni bekliyor...';
+    });
+  </script>
+</body>
+</html>
